@@ -20,11 +20,11 @@ import (
 	"github.com/p14yground/go-github-selfupdate/selfupdate"
 	"google.golang.org/grpc"
 
+	"github.com/naiba/nezha/cmd/agent/monitor"
 	"github.com/naiba/nezha/model"
 	"github.com/naiba/nezha/pkg/utils"
 	pb "github.com/naiba/nezha/proto"
 	"github.com/naiba/nezha/service/dao"
-	"github.com/naiba/nezha/service/monitor"
 	"github.com/naiba/nezha/service/rpc"
 )
 
@@ -80,7 +80,7 @@ func main() {
 	dao.Version = version
 
 	var debug bool
-	flag.String("i", "", "unused 旧Agent兼容")
+	flag.String("i", "", "unused 旧Agent配置兼容")
 	flag.BoolVar(&debug, "d", false, "允许不安全连接")
 	flag.StringVar(&server, "s", "localhost:5555", "管理面板RPC端口")
 	flag.StringVar(&clientSecret, "p", "", "Agent连接Secret")
@@ -105,6 +105,8 @@ func run() {
 
 	// 上报服务器信息
 	go reportState()
+	// 更新IP信息
+	go monitor.UpdateIP()
 
 	if version != "" {
 		go func() {
